@@ -124,13 +124,16 @@ def main():
 	cmd_opts = parse_cmd_args()
 	if cmd_opts.debug: print(cmd_opts)
 	my_location = { "latitude": cmd_opts.latitude, "longitude": cmd_opts.longitude }
-	if not my_location.get("latitude"):
-		if not my_location.get("longitude"):
-			my_location = getLocation()
+	try:
+		assert my_location.get("latitude") is not None, "Latitude argument not passed in"
+		assert my_location.get("longitude") is not None, "Longitude argument not passed in"
+	except AssertionError as e:
+		print(f"{e}, attempting to obtain location from location services")
+		my_location = getLocation()
 	my_index = getIndex(my_location["latitude"], my_location["longitude"])
 	image_map = getMap(my_location["latitude"]) # Pass the latitude to get the Norther or Southern Hemisphere
 	print(f"Lat:  {my_location['latitude']}\n" \
-       	f"Long: {my_location['longitude']}\n" \
+		f"Long: {my_location['longitude']}\n" \
 		f"Indx: {my_index[0][2]}\n\n" \
 		f"UTC\ntime:\t\t{datetime.datetime.utcnow()}\n" \
 		f"Observation:\t{my_index[1]}\n" \
