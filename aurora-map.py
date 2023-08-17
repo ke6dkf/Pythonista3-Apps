@@ -117,8 +117,6 @@ def parse_cmd_args():
 		dest = "longitude", default = None, type=float
 	)
 	results = parser.parse_args()
-	if not any(vars(results).values()):
-		parser.error('No arguments provided.')
 	return results
 
 
