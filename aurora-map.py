@@ -1,5 +1,6 @@
 #!python3
 
+import argparse
 import http.client
 import io
 import json
@@ -99,8 +100,35 @@ def getIndex(lat, long):
 	return result, data["Observation Time"], data["Forecast Time"]
 
 
+def parse_cmd_args():
+	cmdhelp = [
+		"Enable Debugging",
+		"Latitude: DD.d",
+		"Longitude: DD.d"
+	]
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-d", "--debug", help=cmdhelp[0], 
+		default=False, action='store_true', dest = "debug"
+	)
+	parser.add_argument("-lat", help=cmdhelp[1], 
+		dest = "latitude", default = None, type=float
+	)
+	parser.add_argument("-lon", help=cmdhelp[1], 
+		dest = "longitude", default = None, type=float
+	)
+	results = parser.parse_args()
+	if not any(vars(results).values()):
+		parser.error('No arguments provided.')
+	return results
+
+
 def main():
-	my_location = getLocation()
+	cmd_opts = parse_cmd_args()
+	if cmd_opts.debug: print(cmd_opts)
+	my_location = { "latitude": cmd_opts.latitude, "longitude": cmd_opts.longitude }
+	if not my_location.get("latitude"):
+		if not my_location.get("longitude"):
+			my_location = getLocation()
 	my_index = getIndex(my_location["latitude"], my_location["longitude"])
 	image_map = getMap(my_location["latitude"]) # Pass the latitude to get the Norther or Southern Hemisphere
 	print(f"Lat:  {my_location['latitude']}\n" \
